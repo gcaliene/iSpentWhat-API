@@ -2,7 +2,11 @@
   "name": "ispentwhat-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gcaliene/ispentwhat-API.git"
+  },
   "scripts": {
     "start": "node server.js",
     "test": "mocha"
