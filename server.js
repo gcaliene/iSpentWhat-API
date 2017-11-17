@@ -60,6 +60,10 @@ app.get('/api/*', (req, res) => {
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 
+process.on('SIGINT', function() {
+  process.exit();
+});
+
 module.exports = {app};
 
 //https://guarded-dawn-76753.herokuapp.com/ | https://git.heroku.com/guarded-dawn-76753.git

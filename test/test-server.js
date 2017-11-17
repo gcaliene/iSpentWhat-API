@@ -18,3 +18,13 @@ describe('API', function() {
          });
      });
    });
+
+let server;
+
+before(()=> {
+  server=app.listen(0);
+});
+
+after(() => {
+  server.close();
+});
