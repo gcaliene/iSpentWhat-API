@@ -6,6 +6,6 @@ deploy:
   provider: heroku
   api_key:
     secure: lcRryU+GtyaUUBvJdo9zEPuuSu47jou1jc/fcAupsRf78fLdMtxaUgeNCb61tPZIA67V2bhADFpFoPoP1tC15RlymBMthrBpvYpgnKu5zKiCMtMIOuqgb2ngSEzVaxuFugyEiqe1aLVAl20GpZ8viUbETg4LZLyajoMPk/Ue1ekL8H+C2Gm22bzU4+IFogNDBjG6ZTbIQe2AzqAYKLigbvV/iJH/SXzExX20r7dziG5puM0dZcpRS09BHYRhmCpZxv/oRc2LgCzZW7zAnqptEz2mTjM9nJ0rlCjthDwguMLaNhVRodAcWTZTdDdbSUfRxyHsdcHQc81QzOSeJ8nBWTSv8fgcYDYu4suiJzkvTz5fSvmO3V9XmpoQbGB/E2CgbPB7nt/edU8G3wsaQag6wNQsQSdYIjitCrdKWKslCyUvQd7rM8nRFRdPhhFj3sPze9GOaYXvPNY9XlIQC/KTw4prabK1+Vcx2PiWx+8c4DfLSQk49fi1OQc9cCEnGRLXHBAptZrOvp75gNL1qm+0NYn5WAZqBkML96flYjCxYRVA/oTC+hYs0WtdQ0YPVausQEHYCksWWe3QovQewLHRlQwR2SBoksBcXlCE/GaNm6gCRu/7XluCGDCwVkVU6J/e0xKPqzW+16+h6h5no2b0ScZyjbvMcF7zrJXWleGnjBY=
-  app: https://guarded-dawn-76753.herokuapp.com
+  app: guarded-dawn-76753
   on:
     repo: gcaliene/ispentwhat-API
