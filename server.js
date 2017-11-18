@@ -2,10 +2,12 @@ const express = require('express');
 const cors = require('cors'); //netlify is on a different domain
 const app = express();
 const bodyParser = require('body-parser'); //we need body-parser to send json to the server. takes string body and converts it to javascr object
+const _ = require('lodash');
 
 
 var {mongoose} = require('./db/mongoose');
 var {Expense} = require('./models/expenseModel');
+var {ObjectID} = require('mongodb');
 
 const PORT = process.env.PORT || 3000;
 
@@ -25,7 +27,7 @@ app.use(
 ///\\```CORS Setup ////\\\ 
 
 
-//////////      ////  POST  ////  Expense   //////
+/////////////\\\\\\\\\\\\\\\\\\////  POST  \\\\\\\\\\\\\\\\////  Expense   //////
 app.post('/expenses', (req,res) => {
   //console.log(req.body); //where the body gets stored by body-Parser
   var expense = new Expense ({
@@ -40,9 +42,9 @@ app.post('/expenses', (req,res) => {
     res.status(400).send(e.errors.text.message);
   });
 });
-///////\\\\POST /////\\\\\
+///////////////////\\\\\\\\\\\\\\\\\\//////////////////////\\\\\\\\\\\\\\\
 
-///////\\\\\//////////\\\\\\\\\\\\\\GET//////\\\\\\\\\\\\\\\\\///////////
+///////\\\\\//////////\\\\\\\\\\\\\\````GET````//////\\\\\\\\\\\\\\\\\///////////
 ////we want all the todos
 app.get('/expenses' , (req,res) => {
   Expense.find().then((expenses) => {
@@ -52,12 +54,81 @@ app.get('/expenses' , (req,res) => {
   });
 });
 /////\\\\\\\ GET /////////\\\\\\
+///''''''""""""""""""""""""" Get Todos by ID ''''''''''''
+app.get('/expenses/:id', (req, res) => {
+  console.log(req.params.id);
+  var id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+  Expense.findById(id).then((expense) => {
+    if (!expense) {
+      return res.status(404).send();
+    }
+    res.send({expense});
+  }).catch((e) => {
+    res.status(400).send();
+  });
+});
 
 
 app.get('/api/*', (req, res) => {
   res.json({ok: true});
 });
 
+
+/////////////\\\\\\\\\\\\\\\\\\\\\ DELETE ////////////\\\\\\\\\\\\\\\\\
+app.delete('/expenses/:id', (req, res) => {
+  var id = req.params.id;
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  Expense.findByIdAndRemove(id).then((expense) => {
+    if (!expense) {
+      return res.status(404).send();
+    }
+
+    res.send({expense}); //remember to send an object ya dummy
+  }).catch((e) => {
+    res.status(400).send();
+  });
+});
+
+
+//////////////\\\\\\\\\\\\ PUT ///////////\\\\\\\\\\\\\\
+
+app.patch('/expenses/:id', (req, res) => { //https://stackoverflow.com/questions/24241893/rest-api-patch-or-put
+  var id = req.params.id;
+  var body = _.pick(req.body, ['description', 'amount', 'note', 'createdAt']);
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  // if (_.isBoolean(body.completed) && body.completed) {
+  //   body.completedAt = new Date().getTime();
+  // } else {
+  //   body.completed = false;
+  //   body.completedAt = null;
+  // }
+
+  Expense.findByIdAndUpdate(id, {$set: body}, {new: true}).then((expense) => {
+    if (!expense) {
+      return res.status(404).send();
+    }
+    res.send({expense});
+  }).catch((e) => {
+    res.status(400).send();
+  })
+});
+
+
+
+
+
+/////\\\\\````SERVER SETUP````////////\\\\\
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 
 process.on('SIGINT', function() {
@@ -66,5 +137,5 @@ process.on('SIGINT', function() {
 
 module.exports = {app};
 
+
 //https://guarded-dawn-76753.herokuapp.com/ | https://git.heroku.com/guarded-dawn-76753.git
-// 24cfab2e-9acf-428a-bb0a-64a65ec1c4af
