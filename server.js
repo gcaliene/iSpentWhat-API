@@ -5,11 +5,19 @@ const bodyParser = require('body-parser'); //we need body-parser to send json to
 const _ = require('lodash');
 
 
-var {mongoose} = require('./db/mongoose');
-var {Expense} = require('./models/expenseModel');
-var {ObjectID} = require('mongodb');
+const {mongoose} = require('./db/mongoose');
+const {Expense} = require('./models/expenseModel');
+const {ObjectID} = require('mongodb');
+const {CLIENT_ORIGIN} = require('./config');
+
 
 const PORT = process.env.PORT || 3000;
+
+app.use(
+    cors({
+        origin: CLIENT_ORIGIN
+    })
+);
 
 
 //app.use to configure the middleware, if custom it will be a function, if 3rd party then access something of off the library
@@ -17,14 +25,14 @@ app.use(bodyParser.json());//the return value from this json method is a functio
 
 
 
-///\\```CORS Setup ////\\\ 
+///\\```CORS Setup ////\\\
 const {CLIENT_ORIGIN} = require('./config');
 app.use(
     cors({
         origin: CLIENT_ORIGIN
     })
 );
-///\\```CORS Setup ////\\\ 
+///\\```CORS Setup ////\\\
 
 
 /////////////\\\\\\\\\\\\\\\\\\////  POST  \\\\\\\\\\\\\\\\////  Expense   //////
