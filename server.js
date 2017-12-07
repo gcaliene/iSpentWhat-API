@@ -26,27 +26,43 @@ app.use(function(req, res, next) {
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept'
   );
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE');
   next();
 });
 ///\\```CORS Setup ////\\\
 
 /////////////\\\\\\\\\\\\\\\\\\////  POST  \\\\\\\\\\\\\\\\////  Expense   //////
 app.post('/expenses', (req, res) => {
-  //console.log(req.body); //where the body gets stored by body-Parser
-  var expense = new Expense({
-    description: req.body.description,
-    amount: req.body.amount,
-    note: req.body.note,
-    createdAt: req.body.createdAt
+  console.log(req.body); //where the body gets stored by body-Parser
+  const expense = new Expense({
+    description: req.body.description.description,
+    amount: req.body.description.amount,
+    note: req.body.description.note,
+    createdAt: req.body.description.createdAt
   });
-  expense.save().then(
-    doc => {
-      res.send(doc);
-    },
-    e => {
-      res.status(400).send(e.errors.text.message);
+  expense.save((err, expense) => {
+    if (err) {
+      res.send(err);
+    } else {
+      Expense.find((err, data) => {
+        if (err) {
+          res.send(err);
+        } else {
+          data => res.send({ data });
+        }
+      });
     }
-  );
+  });
+
+  // expense.save().then(
+  //   doc => {
+  //     res.send(doc);
+  //   },
+  //   e => {
+  //     //res.status(400).send(e.errors.text.message);
+  //     console.log(e);
+  //   }
+  // );
 });
 ///////////////////\\\\\\\\\\\\\\\\\\//////////////////////\\\\\\\\\\\\\\\
 
@@ -64,34 +80,6 @@ app.get('/expenses', (req, res) => {
   );
 });
 //
-// app.get('/expenses', (req, res) => {
-//     res.json({
-//         lists: [
-//             {
-//                 title: 'Example list 1',
-//                 cards: [
-//                     {
-//                         text: 'Example card 1'
-//                     },
-//                     {
-//                         text: 'Example card 2'
-//                     }
-//                 ]
-//             },
-//             {
-//                 title: 'Example list 2',
-//                 cards: [
-//                     {
-//                         text: 'Example card 1'
-//                     },
-//                     {
-//                         text: 'Example card 2'
-//                     }
-//                 ]
-//             }
-//         ]
-//     });
-// });
 
 /////\\\\\\\ GET /////////\\\\\\
 ///''''''""""""""""""""""""" Get Todos by ID ''''''''''''
@@ -119,6 +107,7 @@ app.get('/api/*', (req, res) => {
 
 /////////////\\\\\\\\\\\\\\\\\\\\\ DELETE ////////////\\\\\\\\\\\\\\\\\
 app.delete('/expenses/:id', (req, res) => {
+  console.log(req.params);
   var id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
@@ -138,10 +127,10 @@ app.delete('/expenses/:id', (req, res) => {
     });
 });
 
-//////////////\\\\\\\\\\\\ PUT/patch Needs patch because maybe updating one or two things ///////////\\\\\\\\\\\\\\
+//////////////\\\\\\\\\\\\ PUT/patch Needs patch because maybe updating one or two things /fetch doesn't allow patch ///////////\\\\\\\\\\\\\\
 
-app.patch('/expenses/:id', (req, res) => {
-  //https://stackoverflow.com/questions/24241893/rest-api-patch-or-put
+app.put('/expenses/:id', (req, res) => {
+  //https://stackoverflow.com/questions/24241893/rest-api-patch-or-put //put for fetch but patch works for axios
   var id = req.params.id;
   var body = _.pick(req.body, ['description', 'amount', 'note', 'createdAt']);
 
