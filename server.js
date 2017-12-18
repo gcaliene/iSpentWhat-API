@@ -1,14 +1,25 @@
+'use strict';
+require('dotenv').config();
 const express = require('express');
+const morgan = require('morgan');
+const passport = require('passport');
 const cors = require('cors'); //netlify is on a different domain
 const app = express();
 const bodyParser = require('body-parser'); //we need body-parser to send json to the server. takes string body and converts it to javascr object
 const _ = require('lodash');
+const mongoose = require('mongoose');
 
-const { mongoose } = require('./db/mongoose');
+//const { mongoose } = require('./db/mongoose');
 const { Expense } = require('./models/expenseModel');
 const { ObjectID } = require('mongodb');
 const { CLIENT_ORIGIN } = require('./config');
-const { PORT } = require('./config');
+const { PORT, DATABASE_URL } = require('./config');
+
+const { router: usersRouter } = require('./users');
+const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
+
+// Logging
+app.use(morgan('common'));
 
 //app.use to configure the middleware, if custom it will be a function, if 3rd party then access something of off the library
 app.use(bodyParser.json()); //the return value from this json method is a function and that is the middleware we send to express
@@ -27,18 +38,40 @@ app.use(function(req, res, next) {
     'Origin, X-Requested-With, Content-Type, Accept'
   );
   res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE');
+  if (req.method === 'OPTIONS') {
+    return res.send(204);
+  }
   next();
 });
-///\\```CORS Setup ////\\\
+///\\``End of CORS Setup ////\\\
+
+passport.use(localStrategy);
+passport.use(jwtStrategy);
+
+app.use('/api/users/', usersRouter);
+app.use('/api/auth/', authRouter);
+
+const jwtAuth = passport.authenticate('jwt', { session: false });
+
+// A protected endpoint which needs a valid JWT to access it
+app.get('/api/protected', jwtAuth, (req, res) => {
+  return res.json({
+    data: 'rosebud'
+  });
+});
+
+app.use('*', (req, res) => {
+  return res.status(404).json({ message: 'Not Found' });
+});
 
 /////////////\\\\\\\\\\\\\\\\\\////  POST  \\\\\\\\\\\\\\\\////  Expense   //////
 app.post('/expenses', (req, res) => {
   console.log(req.body); //where the body gets stored by body-Parser
   const expense = new Expense({
-    description: req.body.description.description,
-    amount: req.body.description.amount,
-    note: req.body.description.note,
-    createdAt: req.body.description.createdAt
+    description: req.body.description,
+    amount: req.body.amount,
+    note: req.body.note,
+    createdAt: req.body.createdAt
   });
   expense.save((err, expense) => {
     if (err) {
@@ -48,7 +81,7 @@ app.post('/expenses', (req, res) => {
         if (err) {
           res.send(err);
         } else {
-          data => res.send({ data });
+          res.json(data);
         }
       });
     }
@@ -156,14 +189,57 @@ app.put('/expenses/:id', (req, res) => {
       res.status(400).send();
     });
 });
+//
+// /////\\\\\````SERVER SETUP````////////\\\\\
+// app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+//
+// process.on('SIGINT', function() {
+//   process.exit();
+// });
+//
+// module.exports = { app };
 
-/////\\\\\````SERVER SETUP````////////\\\\\
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+// Referenced by both runServer and closeServer. closeServer
+// assumes runServer has run and set `server` to a server object
+let server;
 
-process.on('SIGINT', function() {
-  process.exit();
-});
+function runServer() {
+  return new Promise((resolve, reject) => {
+    mongoose.connect(DATABASE_URL, { useMongoClient: true }, err => {
+      if (err) {
+        return reject(err);
+      }
+      server = app
+        .listen(PORT, () => {
+          console.log(`Your app is listening on port ${PORT}`);
+          resolve();
+        })
+        .on('error', err => {
+          mongoose.disconnect();
+          reject(err);
+        });
+    });
+  });
+}
 
-module.exports = { app };
+function closeServer() {
+  return mongoose.disconnect().then(() => {
+    return new Promise((resolve, reject) => {
+      console.log('Closing server');
+      server.close(err => {
+        if (err) {
+          return reject(err);
+        }
+        resolve();
+      });
+    });
+  });
+}
+
+if (require.main === module) {
+  runServer().catch(err => console.error(err));
+}
+
+module.exports = { app, runServer, closeServer };
 
 //https://guarded-dawn-76753.herokuapp.com/ | https://git.heroku.com/guarded-dawn-76753.git
