@@ -1,4 +1,4 @@
-'use strict';
+//'use strict';
 require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
@@ -60,9 +60,9 @@ app.get('/api/protected', jwtAuth, (req, res) => {
   });
 });
 
-app.use('*', (req, res) => {
-  return res.status(404).json({ message: 'Not Found' });
-});
+// app.use('*', (req, res) => {
+//   return res.status(404).json({ message: 'Not Found' });
+// });
 
 /////////////\\\\\\\\\\\\\\\\\\////  POST  \\\\\\\\\\\\\\\\////  Expense   //////
 app.post('/expenses', (req, res) => {
@@ -103,6 +103,7 @@ app.post('/expenses', (req, res) => {
 ////we want all the todos
 
 app.get('/expenses', (req, res) => {
+  console.log('=======');
   Expense.find().then(
     expenses => {
       res.send({ expenses }); //when passing back an array, create an object. it opens up to a more flexible future
@@ -117,7 +118,7 @@ app.get('/expenses', (req, res) => {
 /////\\\\\\\ GET /////////\\\\\\
 ///''''''""""""""""""""""""" Get Todos by ID ''''''''''''
 app.get('/expenses/:id', (req, res) => {
-  console.log(req.params.id);
+  console.log('req.params.id=' + req.params.id);
   var id = req.params.id;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send();

@@ -10,6 +10,9 @@ const jsonParser = bodyParser.json();
 
 // Post to register a new user
 router.post('/', jsonParser, (req, res) => {
+  //console.log(req.body)
+
+  //Validations below
   const requiredFields = ['username', 'password'];
   const missingField = requiredFields.find(field => !(field in req.body));
 
@@ -89,6 +92,7 @@ router.post('/', jsonParser, (req, res) => {
       location: tooSmallField || tooLargeField
     });
   }
+  //End OF VALIDATION
 
   let { username, password, firstName = '', lastName = '' } = req.body;
   // Username and password come in pre-trimmed, otherwise we throw an error
