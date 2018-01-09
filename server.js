@@ -65,7 +65,7 @@ app.get('/api/protected', jwtAuth, (req, res) => {
 // });
 
 /////////////\\\\\\\\\\\\\\\\\\////  POST  \\\\\\\\\\\\\\\\////  Expense   //////
-app.post('/expenses', (req, res) => {
+app.post('/expenses', jwtAuth, (req, res) => {
   console.log(req.body); //where the body gets stored by body-Parser
   const expense = new Expense({
     description: req.body.description,
@@ -102,7 +102,7 @@ app.post('/expenses', (req, res) => {
 ///////\\\\\//////////\\\\\\\\\\\\\\````GET````//////\\\\\\\\\\\\\\\\\///////////
 ////we want all the todos
 
-app.get('/expenses', (req, res) => {
+app.get('/expenses', jwtAuth, (req, res) => {
   console.log('=======');
   Expense.find().then(
     expenses => {
@@ -117,7 +117,7 @@ app.get('/expenses', (req, res) => {
 
 /////\\\\\\\ GET /////////\\\\\\
 ///''''''""""""""""""""""""" Get Todos by ID ''''''''''''
-app.get('/expenses/:id', (req, res) => {
+app.get('/expenses/:id', jwtAuth, (req, res) => {
   console.log('req.params.id=' + req.params.id);
   var id = req.params.id;
   if (!ObjectID.isValid(id)) {
@@ -135,12 +135,17 @@ app.get('/expenses/:id', (req, res) => {
     });
 });
 
-app.get('/api/*', (req, res) => {
-  res.json({ ok: true });
+app.get('/currentUser', jwtAuth, (req, res) => {
+  console.log(req.user.username);
+  res.json(req.user.username); //just sends back user
 });
 
+// app.get('/api/*', (req, res) => {
+//   res.json({ ok: true });
+// });
+
 /////////////\\\\\\\\\\\\\\\\\\\\\ DELETE ////////////\\\\\\\\\\\\\\\\\
-app.delete('/expenses/:id', (req, res) => {
+app.delete('/expenses/:id', jwtAuth, (req, res) => {
   console.log(req.params);
   var id = req.params.id;
 
@@ -163,7 +168,7 @@ app.delete('/expenses/:id', (req, res) => {
 
 //////////////\\\\\\\\\\\\ PUT/patch Needs patch because maybe updating one or two things /fetch doesn't allow patch ///////////\\\\\\\\\\\\\\
 
-app.put('/expenses/:id', (req, res) => {
+app.put('/expenses/:id', jwtAuth, (req, res) => {
   //https://stackoverflow.com/questions/24241893/rest-api-patch-or-put //put for fetch but patch works for axios
   var id = req.params.id;
   var body = _.pick(req.body, ['description', 'amount', 'note', 'createdAt']);
