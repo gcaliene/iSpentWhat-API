@@ -71,7 +71,8 @@ app.post('/expenses', jwtAuth, (req, res) => {
     description: req.body.description,
     amount: req.body.amount,
     note: req.body.note,
-    createdAt: req.body.createdAt
+    createdAt: req.body.createdAt,
+    user: req.body.user
   });
   expense.save((err, expense) => {
     if (err) {
