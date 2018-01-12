@@ -31,18 +31,29 @@ app.use(
   })
 );
 
+// CORS
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
+  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
   res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE');
   if (req.method === 'OPTIONS') {
     return res.send(204);
   }
   next();
 });
+
+// app.use(function(req, res, next) {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header(
+//     'Access-Control-Allow-Headers',
+//     'Origin, X-Requested-With, Content-Type, Accept'
+//   );
+//   res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE');
+//   if (req.method === 'OPTIONS') {
+//     return res.send(204);
+//   }
+//   next();
+// });
 ///\\``End of CORS Setup ////\\\
 
 passport.use(localStrategy);
@@ -87,16 +98,6 @@ app.post('/expenses', jwtAuth, (req, res) => {
       });
     }
   });
-
-  // expense.save().then(
-  //   doc => {
-  //     res.send(doc);
-  //   },
-  //   e => {
-  //     //res.status(400).send(e.errors.text.message);
-  //     console.log(e);
-  //   }
-  // );
 });
 ///////////////////\\\\\\\\\\\\\\\\\\//////////////////////\\\\\\\\\\\\\\\
 
@@ -178,13 +179,6 @@ app.put('/expenses/:id', jwtAuth, (req, res) => {
     return res.status(404).send();
   }
 
-  // if (_.isBoolean(body.completed) && body.completed) {
-  //   body.completedAt = new Date().getTime();
-  // } else {
-  //   body.completed = false;
-  //   body.completedAt = null;
-  // }
-
   Expense.findByIdAndUpdate(id, { $set: body }, { new: true })
     .then(expense => {
       if (!expense) {
@@ -196,18 +190,7 @@ app.put('/expenses/:id', jwtAuth, (req, res) => {
       res.status(400).send();
     });
 });
-//
-// /////\\\\\````SERVER SETUP````////////\\\\\
-// app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
-//
-// process.on('SIGINT', function() {
-//   process.exit();
-// });
-//
-// module.exports = { app };
 
-// Referenced by both runServer and closeServer. closeServer
-// assumes runServer has run and set `server` to a server object
 let server;
 
 function runServer() {
