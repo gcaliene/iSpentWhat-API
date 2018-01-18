@@ -5,7 +5,9 @@ https://github.com/gcaliene/ispentwhat-client
 
 ### Prerequisites
 
-After cloning proceed to start the api by starting up a local mongo server.
+After cloning proceed to start the api by starting up a local mongo server. 
+Recommended to download the client: https://github.com/gcaliene/ispentwhat-client
+
 
 ### Installing
 
