@@ -14,7 +14,7 @@ npm install
 npm start
 ```
 
-## Running the tests
+## Testing
 ```
 npm test
 ```
