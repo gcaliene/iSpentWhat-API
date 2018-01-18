@@ -1,8 +1,3 @@
-
-# Start of the Readme
-sdfsdfsdf
-
-
 # ispentwhat-API
 
 The API backend for ispentwhat-client:
