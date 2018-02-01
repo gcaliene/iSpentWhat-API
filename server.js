@@ -17,6 +17,7 @@ const { PORT, DATABASE_URL } = require('./config');
 
 const { router: usersRouter } = require('./users');
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
+const { router: budgetRouter } = require('./budget');
 
 // Logging
 app.use(morgan('common'));
@@ -61,15 +62,16 @@ passport.use(jwtStrategy);
 
 app.use('/api/users/', usersRouter);
 app.use('/api/auth/', authRouter);
+app.use('/api/budget/', budgetRouter);
 
 const jwtAuth = passport.authenticate('jwt', { session: false });
 
-// A protected endpoint which needs a valid JWT to access it
-app.get('/api/protected', jwtAuth, (req, res) => {
-  return res.json({
-    data: 'rosebud'
-  });
-});
+// // A protected endpoint which needs a valid JWT to access it
+// app.get('/api/protected', jwtAuth, (req, res) => {
+//   return res.json({
+//     data: 'rosebud'
+//   });
+// });
 
 // app.use('*', (req, res) => {
 //   return res.status(404).json({ message: 'Not Found' });
